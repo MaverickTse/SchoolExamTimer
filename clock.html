@@ -1,0 +1,278 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Exam Timer
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+</head>
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.menu-container {
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  overflow: hidden;
+  left: 0;
+  top: 0;
+  transition-delay: .3s;
+}
+
+.menu {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  background-color: #1c7cd6;
+  border-radius: 100%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  transition: all .3s;
+}
+
+#hamburger {
+  display: none;
+}
+
+label {
+  position: absolute;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 100%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  z-index: 2;
+  cursor: pointer;
+  tap-highlight-color: transparent;
+}
+label:before {
+  content: "";
+  position: absolute;
+  top: 65%;
+  left: 65%;
+  width: 1em;
+  height: 0.15em;
+  background: white;
+  box-shadow: 0 0.25em 0 0 white, 0 0.5em 0 0 white;
+  -webkit-transform: scale(2);
+          transform: scale(2);
+}
+
+#hamburger:checked ~ .menu-container {
+  width: 30vw;
+  height: 100vh;
+  transition-delay: 0s;
+}
+
+#hamburger:checked ~ .menu-container .menu {
+  width: 250vh;
+  height: 250vh;
+  transition: all .3s;
+}
+
+.menu-container .links {
+  position: absolute;
+  left: 15vw;
+  top: 50vh;
+  z-index: 3;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  text-align: center;
+}
+.menu-container .links a {
+  display: block;
+  color: white;
+  font-size: 1.5rem;
+  text-decoration: none;
+  margin: 1rem;
+}
+
+.menu-container .links select, input {
+    font-size: 1.5rem;
+    margin: 0.5rem;
+    size: 32;
+}
+
+.menu-container .links button {
+  display: block;
+  font-size: 2rem;
+  text-decoration: none;
+  margin: 1rem;
+  border-width: 3px;
+  border-color: white;
+}
+
+
+.content {
+  padding: 3rem 10rem;
+  transition: all .2s;
+  transition-delay: .1s;
+  text-align: center;
+}
+.content h1 {
+  font-size: 2rem;
+  color: #212529;
+}
+.content h1:not(.header) {
+  margin-top: 1rem;
+}
+.content p {
+  margin-top: 2rem;
+  color: #495057;
+}
+
+.content progress {
+    width: 80%;
+    height: 1vw;
+    display: inline-block;
+    background: #eeeeee;
+}
+
+.content progress::-webkit-progress-bar {
+   
+    background: #eeeeee;    
+}
+
+.content progress::-webkit-progress-value {
+    background: #1c7cd6;
+}
+
+.content #clock {
+    font-size: 12rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.content #warn {
+    color: #ffbb00;
+    font-size: 3rem;
+    display: none;
+}
+
+.content #timeup {
+    color: #ff0000;
+    font-size: 3rem;
+    display: none;
+}
+
+
+#hamburger:checked ~ .content {
+  padding-left: 35vw;
+  transition: all .2s;
+  transition-delay: 0s;
+}
+
+</style>
+<body>
+    
+<input type="checkbox" id="hamburger" name="hamburger"/>
+<label for="hamburger"></label>
+<div class="menu-container">
+  <div class="menu"></div>
+  <div class="links">
+      <a>Exam Type</a>
+      <select id="examtype">
+          <option>Class Drill</option>
+          <option>IB DP Exam (6294)</option>
+          <option>IB DP Mock Exam (6294)</option>
+          <option>IGCSE Exam (HK074)</option>
+          <option>IGCSE Mock Exam (HK074)</option>
+          <option>Post-Mock</option>
+          <option>EOY Exam</option>
+          
+      </select>
+      <a>Subject Info</a>
+      <input type="text" id="sinfo" placeholder="Biology Practical [0610/52]"/>
+      <a>Start Time</a>
+      <input type="time" id="stime" value="13:00" min="07:00" max="23:00"/>
+      <a>End Time</a>
+      <input type="time" id="etime" value="14:15" min="07:00" max="23:00"/>
+      <a>Beep</a>
+      <select id="toBeep">
+          <option>ON</option>
+          <option>OFF</option>
+      </select>
+      <button id="ok" onclick="setUserData()">SET</button>
+      
+  </div>
+</div>
+<div class="content">
+  <h1 class="header" id="fType">Standby for Exam</h1>
+  <h1 id="fSinfo">Use the hamburger menu on top left to set details</h1>
+  <h1><span id="ftoday"></span>, &nbsp; <span id="ftime"></span></h1>
+  <progress id="barTop" min=0 max=100 value=0></progress>
+  <div id="clock">03:14:15</div>
+  <p id="warn">【LAST 5 MINUTES】</p>
+  <p id="timeup">【TIME IS UP】</p>
+  
+</div>
+<audio id="beep" >
+    <source src="./beep.mp3" type="audio/mpeg">
+</audio>
+
+    <script>
+        
+        function setUserData(){
+            var txtExamtype = document.getElementById('examtype').value;
+            var txtSinfo = document.getElementById('sinfo').value;
+            var today = new Date();
+            var txtToday = today.toDateString();
+            var txtTime = document.getElementById('stime').value + ' ~ ' + document.getElementById('etime').value;
+
+            document.getElementById('fType').textContent = txtExamtype;
+            document.getElementById('fSinfo').textContent = txtSinfo;
+            document.getElementById('ftoday').textContent = txtToday;
+            document.getElementById('ftime').textContent = txtTime;
+        };
+
+        function timerTrigger(){
+            var oDate = new Date();
+            var hr = oDate.getHours();
+            var mm = oDate.getMinutes();
+            var ss = oDate.getSeconds();
+            var txtClock = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
+            document.getElementById('clock').textContent = txtClock;
+            var today = new Date();
+            var Astime = document.getElementById('stime').value.split(':');
+            var Aetime = document.getElementById('etime').value.split(':');
+            var sDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), Number.parseInt(Astime[0]), Number.parseInt(Astime[1]));
+            var eDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), Number.parseInt(Aetime[0]), Number.parseInt(Aetime[1]));
+            var now = today.getTime();
+            if (now >= sDate.getTime() && now < eDate.getTime())
+            {
+                document.getElementById('timeup').style.display = 'none';
+                var p = (Math.abs(now-sDate.getTime())/Math.abs(eDate.getTime()-sDate.getTime()))*100;
+                document.getElementById('barTop').value = p;
+                if ((eDate.getTime()-now) <= 5*60*1000)
+                {
+                    document.getElementById('warn').style.display = 'inline-block';
+                }
+                else{
+                    document.getElementById('warn').style.display = 'none';
+                    
+                }
+            }
+            else{
+                document.getElementById('barTop').value = 0;
+                document.getElementById('warn').style.display = 'none';
+                
+            }
+
+            if (now >= eDate.getTime()){
+                document.getElementById('timeup').style.display = 'inline-block';
+                if (now-eDate.getTime() <= 500 && document.getElementById('toBeep').value=='ON'){
+                    document.getElementById('beep').play();
+                }
+                
+            }    
+
+            setTimeout(timerTrigger, 250);
+        }
+
+        timerTrigger();
+    </script>
+</body>
+</html>
