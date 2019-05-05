@@ -410,10 +410,10 @@ div#modal div:target {
             
             if (document.getElementById('use7').checked){
               document.getElementById('clock').style.display = "none";
-              document.getElementById('display').style.display = "inline-block";
+              document.getElementById('display').style.display = "block";
             }
             else{
-              document.getElementById('clock').style.display = "inline-block";
+              document.getElementById('clock').style.display = "block";
               document.getElementById('display').style.display = "none";
             }
 
@@ -425,14 +425,14 @@ div#modal div:target {
             var mm = oDate.getMinutes();
             var ss = oDate.getSeconds();
             if(!document.getElementById('use7').checked){
-              document.getElementById('clock').style.display = "inline-block";
+              document.getElementById('clock').style.display = "block";
               document.getElementById('display').style.display = "none";
               var txtClock = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
               document.getElementById('clock').textContent = txtClock;
             }
             else {
               document.getElementById('clock').style.display = "none";
-              document.getElementById('display').style.display = "inline-block";
+              document.getElementById('display').style.display = "block";
               var txtseg = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
               display.setValue(txtseg);
               display.draw();
@@ -451,7 +451,7 @@ div#modal div:target {
                 document.getElementById('barTop').value = p;
                 if ((eDate.getTime()-now) <= 5*60*1000)
                 {
-                    document.getElementById('warn').style.display = 'inline-block';
+                    document.getElementById('warn').style.display = 'block';
                 }
                 else{
                     document.getElementById('warn').style.display = 'none';
@@ -465,7 +465,7 @@ div#modal div:target {
             }
 
             if (now >= eDate.getTime()){
-                document.getElementById('timeup').style.display = 'inline-block';
+                document.getElementById('timeup').style.display = 'block';
                 if (now-eDate.getTime() <= 500 && document.getElementById('toBeep').value=='ON'){
                     document.getElementById('beep').play();
                 }
