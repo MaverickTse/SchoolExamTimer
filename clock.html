@@ -238,6 +238,12 @@ label:before {
     
 }
 
+canvas {
+  width: 100%;
+  margin-top: 5%;
+  display: none;
+}
+
 @-webkit-keyframes modalFadeIn {
     0% {opacity:0;display:block;}
     100% {opacity:1;}
@@ -294,6 +300,7 @@ div#modal div:target {
   <h1><span id="ftoday"></span>, &nbsp; <span id="ftime"></span></h1>
   <progress id="barTop" min=0 max=100 value=0></progress>
   <div id="clock">03:14:15</div>
+  <canvas id="display" width="1080px"></canvas>
   <p id="warn">【LAST 5 MINUTES】</p>
   <p id="timeup">【TIME IS UP】</p>
   
@@ -329,6 +336,9 @@ div#modal div:target {
         <br/>
         <label for="txtclock">Clock text size (rem)[12]</label>
         <input type="number" id="txtclock" name="txtclock" value="12" step="0.5"/>
+        <br/>
+        <input type="checkbox" id="use7" name="use7"/>
+        <label for="use7">Use fancy 7-segment display </label>
         
       </p>
       
@@ -341,9 +351,22 @@ div#modal div:target {
 <audio id="beep" >
     <source src="./beep.mp3" type="audio/mpeg">
 </audio>
-
+    <script src="./segment-display.js"></script>
     <script>
-        
+        var display = new SegmentDisplay("display");
+        display.pattern         = "##:##:##";
+        display.displayAngle    = 6;
+        display.digitHeight     = 20;
+        display.digitWidth      = 14;
+        display.digitDistance   = 2.5;
+        display.segmentWidth    = 2;
+        display.segmentDistance = 0.3;
+        display.segmentCount    = 7;
+        display.cornerType      = 3;
+        display.colorOn         = "#090909";
+        display.colorOff        = "#f8f8f8";
+        //display.draw();
+
         function setUserData(){
             
             var txtExamtype = document.getElementById('examtype').value;
@@ -383,6 +406,16 @@ div#modal div:target {
             document.getElementById('ftoday').style.color = fontcolor;
             document.getElementById('ftime').style.color = fontcolor;
             document.getElementById('clock').style.color = fontcolor;
+            display.colorOn = fontcolor;
+            
+            if (document.getElementById('use7').checked){
+              document.getElementById('clock').style.display = "none";
+              document.getElementById('display').style.display = "inline-block";
+            }
+            else{
+              document.getElementById('clock').style.display = "inline-block";
+              document.getElementById('display').style.display = "none";
+            }
 
         };
 
@@ -391,8 +424,20 @@ div#modal div:target {
             var hr = oDate.getHours();
             var mm = oDate.getMinutes();
             var ss = oDate.getSeconds();
-            var txtClock = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
-            document.getElementById('clock').textContent = txtClock;
+            if(!document.getElementById('use7').checked){
+              document.getElementById('clock').style.display = "inline-block";
+              document.getElementById('display').style.display = "none";
+              var txtClock = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
+              document.getElementById('clock').textContent = txtClock;
+            }
+            else {
+              document.getElementById('clock').style.display = "none";
+              document.getElementById('display').style.display = "inline-block";
+              var txtseg = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
+              display.setValue(txtseg);
+              display.draw();
+            }
+            
             var today = new Date();
             var Astime = document.getElementById('stime').value.split(':');
             var Aetime = document.getElementById('etime').value.split(':');
