@@ -469,7 +469,10 @@ div#modal div:target {
                 if (now-eDate.getTime() <= 500 && document.getElementById('toBeep').value=='ON'){
                     document.getElementById('beep').play();
                 }
-                
+                                
+            }
+            else{
+              document.getElementById('timeup').style.display = 'none';
             }    
 
             setTimeout(timerTrigger, 250);
