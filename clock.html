@@ -38,7 +38,7 @@ body {
   display: none;
 }
 
-label {
+label#hamlabel {
   position: absolute;
   width: 10rem;
   height: 10rem;
@@ -91,11 +91,18 @@ label:before {
   margin: 1rem;
 }
 
-.menu-container .links select, input {
+.menu-container .links select {
     font-size: 1.5rem;
     margin: 0.5rem;
     size: 32;
 }
+
+.menu-container .links input {
+    font-size: 1.5rem;
+    margin: 0.5rem;
+    size: 32;
+}
+
 
 .menu-container .links button {
   display: block;
@@ -165,11 +172,90 @@ label:before {
   transition-delay: 0s;
 }
 
+#dlg_about,
+#dlg_setting {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    position: absolute;
+    
+}
+ 
+.close_overlay {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    text-indent: -9999px;
+    position: absolute;
+    background: #000;
+    opacity: 0.5;
+    z-index: 5;
+}
+ 
+.modal_window {
+    top: 50%;
+    left: 50%;
+    margin: -150px 0 0 -200px;
+    width: 400px;
+    height: 300px;
+    text-align: center;
+    display: block;
+    background: #fff;
+    position: absolute;
+    z-index: 10;
+}
+
+.modal_window h2 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    width: 400px;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: left;
+    text-indent: 15px;
+    background:#1c7cd6;
+}
+ 
+.modal_window p {
+    padding: 0 15px 15px 15px;
+    font-size: 12px;
+    line-height: 160%;
+    text-align: left;
+}
+
+.modal_window p label {
+    padding: 0px;
+    font-size: 14px;
+    line-height: 200%;
+    text-align: left;
+    
+}
+
+@-webkit-keyframes modalFadeIn {
+    0% {opacity:0;display:block;}
+    100% {opacity:1;}
+}
+ 
+div#modal div:target {
+    -webkit-animation-name: modalFadeIn; 
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: 1;
+    opacity: 1;
+    display:block;
+}
+
 </style>
 <body>
-    
+ <!-- MENU -->   
 <input type="checkbox" id="hamburger" name="hamburger"/>
-<label for="hamburger"></label>
+<label id="hamlabel" for="hamburger"></label>
 <div class="menu-container">
   <div class="menu"></div>
   <div class="links">
@@ -195,11 +281,14 @@ label:before {
           <option>ON</option>
           <option>OFF</option>
       </select>
+      <a href="#dlg_setting">Fine Settings</a>
+      <a href="#dlg_about">About</a>
       <button id="ok" onclick="setUserData()">SET</button>
       
   </div>
 </div>
-<div class="content">
+<!-- Main content  -->
+<div class="content" id="content">
   <h1 class="header" id="fType">Standby for Exam</h1>
   <h1 id="fSinfo">Use the hamburger menu on top left to set details</h1>
   <h1><span id="ftoday"></span>, &nbsp; <span id="ftime"></span></h1>
@@ -209,6 +298,46 @@ label:before {
   <p id="timeup">【TIME IS UP】</p>
   
 </div>
+
+<!-- CSS dialog -->
+<div id="modal">
+  <div id="dlg_about">
+    <a href="#" class="close_overlay">X</a>
+    <div class="modal_window">
+      <h2>About</h2>
+      <p>SchoolExamTimer by Maverick Tse YM (2019), Hong Kong</p>
+      <p>Source code and issue report on <a href="https://github.com/MaverickTse/SchoolExamTimer" target="_blank">GitHub</a>:</p>
+      <p><a href="https://github.com/MaverickTse/SchoolExamTimer/blob/master/LICENSE" target="_blank">MIT License</a></p>
+      <p>Hint: REFRESH page (F5 on Win/Linux) to restore default settings</p>
+      <p><a href="#">【CLOSE】</a></p>
+    </div>
+  </div>
+
+  <div id="dlg_setting">
+    <a href="#" class="close_overlay">X</a>
+    <div class="modal_window">
+      <h2>Fine Settings</h2>
+      <p>
+        <label for="bgcolor">Background color</label>
+        <input type="color" id="bgcolor" name="bgcolor" value="#ffffff"/>
+        <br/>
+        <label for="txtcolor">Text color</label>
+        <input type="color" id="txtcolor" name="txtcolor" value="#000000"/>
+        <br/>
+        <label for="txtsize" >Title Text size (rem)[2]</label>
+        <input type="number" id="txtsize" name="txtsize" value="2" step="0.5"/>
+        <br/>
+        <label for="txtclock">Clock text size (rem)[12]</label>
+        <input type="number" id="txtclock" name="txtclock" value="12" step="0.5"/>
+        
+      </p>
+      
+      
+    </div>
+  </div>
+</div>
+
+<!-- Beep sound -->
 <audio id="beep" >
     <source src="./beep.mp3" type="audio/mpeg">
 </audio>
@@ -216,16 +345,45 @@ label:before {
     <script>
         
         function setUserData(){
+            
             var txtExamtype = document.getElementById('examtype').value;
             var txtSinfo = document.getElementById('sinfo').value;
             var today = new Date();
             var txtToday = today.toDateString();
             var txtTime = document.getElementById('stime').value + ' ~ ' + document.getElementById('etime').value;
 
+            var st = new Date(today.toDateString()+' '+document.getElementById('stime').value);
+            var et = new Date(today.toDateString()+' '+document.getElementById('etime').value);
+            if (st.getTime() >= et.getTime()){
+              document.getElementById('fType').textContent = "Start Time must preceed End Time!";
+              return;
+            }
+
             document.getElementById('fType').textContent = txtExamtype;
             document.getElementById('fSinfo').textContent = txtSinfo;
             document.getElementById('ftoday').textContent = txtToday;
             document.getElementById('ftime').textContent = txtTime;
+
+            var titleFontRem = document.getElementById('txtsize').value + 'rem';
+
+            document.getElementById('fType').style.fontSize = titleFontRem;
+            document.getElementById('fSinfo').style.fontSize = titleFontRem;
+            document.getElementById('ftoday').style.fontSize = titleFontRem;
+            document.getElementById('ftime').style.fontSize = titleFontRem;
+
+            var clockFontRem = document.getElementById('txtclock').value + 'rem';
+            document.getElementById('clock').style.fontSize = clockFontRem;
+
+            document.querySelector('body').style.background = document.getElementById('bgcolor').value;
+
+            var fontcolor = document.getElementById('txtcolor').value;
+
+            document.getElementById('fType').style.color = fontcolor;
+            document.getElementById('fSinfo').style.color = fontcolor;
+            document.getElementById('ftoday').style.color = fontcolor;
+            document.getElementById('ftime').style.color = fontcolor;
+            document.getElementById('clock').style.color = fontcolor;
+
         };
 
         function timerTrigger(){
