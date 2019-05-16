@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Exam Timer
+    <title>Countdown Timer for Muliple Rounds
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
@@ -86,20 +86,20 @@ label:before {
 .menu-container .links a {
   display: block;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1rem;
   text-decoration: none;
-  margin: 1rem;
+  margin: 0.5rem;
 }
 
 .menu-container .links select {
-    font-size: 1.5rem;
+    font-size: 1rem;
     margin: 0.5rem;
     size: 32;
 }
 
 .menu-container .links input {
-    font-size: 1.5rem;
-    margin: 0.5rem;
+    font-size: 1rem;
+    margin: 0.25rem;
     size: 32;
 }
 
@@ -165,6 +165,27 @@ label:before {
     display: none;
 }
 
+.content #btnStart{
+  display: none;
+  border-width: 3px;
+  border-color: #eeeeee;
+  font-size: 2rem;
+  background-color: #1c7cd6;
+  color: #eeeeee
+}
+
+.content #btnContinue{
+  display: none;
+  border-width: 3px;
+  border-color: #eeeeee;
+  font-size: 2rem;
+  background-color: #1c7cd6;
+  color: #eeeeee
+}
+
+.content #RNum {
+  display: none;
+}
 
 #hamburger:checked ~ .content {
   padding-left: 35vw;
@@ -277,11 +298,19 @@ div#modal div:target {
           
       </select>
       <a>Subject Info</a>
-      <input type="text" id="sinfo" placeholder="Biology Practical [0610/52]"/>
+      <input type="text" id="sinfo" placeholder="Physics Practical [0610/52]"/>
       <a>Start Time</a>
       <input type="time" id="stime" value="13:00" min="07:00" max="23:00"/>
       <a>End Time</a>
       <input type="time" id="etime" value="14:15" min="07:00" max="23:00"/>
+      <a>Rounds</a>
+      <input type="number" min="1" id="rounds" value="3"/>
+      <a>Duration [R=1]</a>
+      <input type="number" min="1" max="60" value="20" id="R1T"/>
+      <a>Duration [1&lt;R&lt;N]</a>
+      <input type="number" min="1" max="60" value="20" id="RiT"/>
+      <a>Duration [R=N]</a>
+      <input type="number" min="1" max="60" value="15" id="RfT"/>
       <a>Beep</a>
       <select id="toBeep">
           <option>ON</option>
@@ -301,8 +330,11 @@ div#modal div:target {
   <progress id="barTop" min=0 max=100 value=0></progress>
   <div id="clock">03:14:15</div>
   <canvas id="display" width="1080px"></canvas>
+  <h1 id="RNum">(Round Number Here)</h1>
   <p id="warn">【LAST 5 MINUTES】</p>
   <p id="timeup">【TIME IS UP】</p>
+  <button id="btnStart" onclick="onStart()">START</button>
+  <button id="btnContinue">Continue</button>
   
 </div>
 
@@ -367,6 +399,41 @@ div#modal div:target {
         display.colorOff        = "#f8f8f8";
         //display.draw();
 
+        var roundCount = 0;
+
+        function updateClockStart(s){
+          if (s<0){
+            clearTimeout(updateClockStart);
+            
+            if (document.getElementById('rounds').value == 1){
+              document.getElementById('btnStart').style.display = "inline-block";
+              document.getElementById('btnContinue').style.display = "none";
+              roundCount = 0;
+              var txtInitTime = document.getElementById('R1T').value.toString().padStart(2,0) + ':' + '00';
+              document.getElementById('clock').textContent = txtInitTime;
+            }
+            else {
+              document.getElementById('btnStart').style.display = "none";
+              document.getElementById('btnContinue').style.display = "inline-block";
+              roundCount += 1;
+              if (document.getElementById('rounds').value > 2){
+                var txtInitTime = document.getElementById('RiT').value.toString().padStart(2,0) + ':' + '00';
+              }
+              else {
+                var txtInitTime = document.getElementById('RfT').value.toString().padStart(2,0) + ':' + '00';
+              }
+              
+              document.getElementById('clock').textContent = txtInitTime;
+            }
+            document.getElementById('RNum').textContent = 'Round ' + (roundCount+1).toString();
+             return;};
+          var mm = Math.floor(s / 60);
+          var ss = s % 60;
+          var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
+          document.getElementById('clock').textContent = txtclock;
+          setTimeout(updateClockStart, 1000, s-1);
+        }
+
         function setUserData(){
             
             var txtExamtype = document.getElementById('examtype').value;
@@ -386,6 +453,15 @@ div#modal div:target {
             document.getElementById('fSinfo').textContent = txtSinfo;
             document.getElementById('ftoday').textContent = txtToday;
             document.getElementById('ftime').textContent = txtTime;
+
+            roundCount = 0;
+            document.getElementById('RNum').textContent = "Round 1";
+            document.getElementById('RNum').style.display = "block";
+            document.getElementById('btnStart').style.display = "inline-block";
+            document.getElementById('btnContinue').style.display = "none";
+
+            var txtInitTime = document.getElementById('R1T').value.toString().padStart(2,0) + ':' + '00';
+            document.getElementById('clock').textContent = txtInitTime;
 
             var titleFontRem = document.getElementById('txtsize').value + 'rem';
 
@@ -419,66 +495,14 @@ div#modal div:target {
 
         };
 
-        function timerTrigger(){
-            var oDate = new Date();
-            var hr = oDate.getHours();
-            var mm = oDate.getMinutes();
-            var ss = oDate.getSeconds();
-            if(!document.getElementById('use7').checked){
-              document.getElementById('clock').style.display = "block";
-              document.getElementById('display').style.display = "none";
-              var txtClock = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
-              document.getElementById('clock').textContent = txtClock;
-            }
-            else {
-              document.getElementById('clock').style.display = "none";
-              document.getElementById('display').style.display = "block";
-              var txtseg = hr.toString().padStart(2,0) + ':' + mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
-              display.setValue(txtseg);
-              display.draw();
-            }
-            
-            var today = new Date();
-            var Astime = document.getElementById('stime').value.split(':');
-            var Aetime = document.getElementById('etime').value.split(':');
-            var sDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), Number.parseInt(Astime[0]), Number.parseInt(Astime[1]));
-            var eDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), Number.parseInt(Aetime[0]), Number.parseInt(Aetime[1]));
-            var now = today.getTime();
-            if (now >= sDate.getTime() && now < eDate.getTime())
-            {
-                document.getElementById('timeup').style.display = 'none';
-                var p = (Math.abs(now-sDate.getTime())/Math.abs(eDate.getTime()-sDate.getTime()))*100;
-                document.getElementById('barTop').value = p;
-                if ((eDate.getTime()-now) <= 5*60*1000)
-                {
-                    document.getElementById('warn').style.display = 'block';
-                }
-                else{
-                    document.getElementById('warn').style.display = 'none';
-                    
-                }
-            }
-            else{
-                document.getElementById('barTop').value = 0;
-                document.getElementById('warn').style.display = 'none';
-                
-            }
-
-            if (now >= eDate.getTime()){
-                document.getElementById('timeup').style.display = 'block';
-                if (now-eDate.getTime() <= 500 && document.getElementById('toBeep').value=='ON'){
-                    document.getElementById('beep').play();
-                }
-                                
-            }
-            else{
-              document.getElementById('timeup').style.display = 'none';
-            }    
-
-            setTimeout(timerTrigger, 250);
+        function onStart(){
+          document.getElementById('btnStart').style.display = "none";
+          var countSecond = document.getElementById('R1T').value * 60 -1;
+          setTimeout(updateClockStart, 1000, countSecond);
+          
         }
 
-        timerTrigger();
+        
     </script>
 </body>
 </html>
