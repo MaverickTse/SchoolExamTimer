@@ -379,6 +379,13 @@ div#modal div:target {
         display.colorOff        = "#f8f8f8";
         //display.draw();
 
+        function setTodayDate(){
+          // Set text for today
+          var today = new Date();
+          var txtToday = today.toDateString();
+          document.getElementById('ftoday').textContent = txtToday;
+        }
+
         function setUserData(){
             
             var txtExamtype = document.getElementById('examtype').value;
@@ -433,6 +440,7 @@ div#modal div:target {
         };
 
         function timerTrigger(){
+            setTodayDate();
             var oDate = new Date();
             var hr = oDate.getHours();
             var mm = oDate.getMinutes();
