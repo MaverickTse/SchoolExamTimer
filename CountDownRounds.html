@@ -386,7 +386,7 @@ div#modal div:target {
     <script src="./segment-display.js"></script>
     <script>
         var display = new SegmentDisplay("display");
-        display.pattern         = "##:##:##";
+        display.pattern         = "##:##";
         display.displayAngle    = 6;
         display.digitHeight     = 20;
         display.digitWidth      = 14;
@@ -440,6 +440,16 @@ div#modal div:target {
           var ss = s % 60;
           var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
           document.getElementById('clock').textContent = txtclock;
+          display.setValue(txtclock);
+          if(document.getElementById('use7').checked){
+              document.getElementById('display').style.display = "inline";
+              document.getElementById('clock').style.display = "none";
+              display.draw();
+            }
+            else{
+              document.getElementById('display').style.display = "none";
+              document.getElementById('clock').style.display = "inline";
+            }
           setTodayDate();
           var barVal = ((document.getElementById('R1T').value*60 - s)/(document.getElementById('R1T').value*60))*100;
           document.getElementById('barTop').value = barVal;
@@ -486,6 +496,16 @@ div#modal div:target {
           var ss = s % 60;
           var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
           document.getElementById('clock').textContent = txtclock;
+          display.setValue(txtclock);
+          if(document.getElementById('use7').checked){
+              document.getElementById('display').style.display = "inline";
+              document.getElementById('clock').style.display = "none";
+              display.draw();
+            }
+            else{
+              document.getElementById('display').style.display = "none";
+              document.getElementById('clock').style.display = "inline";
+            }
           setTodayDate();
           var pval = 0;
           if ((document.getElementById('rounds').value - roundCount) <= 1){
@@ -527,6 +547,17 @@ div#modal div:target {
 
             var txtInitTime = document.getElementById('R1T').value.toString().padStart(2,0) + ':' + '00';
             document.getElementById('clock').textContent = txtInitTime;
+            display.setValue(txtInitTime);
+
+            if(document.getElementById('use7').checked){
+              document.getElementById('display').style.display = "inline";
+              document.getElementById('clock').style.display = "none";
+              display.draw();
+            }
+            else{
+              document.getElementById('display').style.display = "none";
+              document.getElementById('clock').style.display = "inline";
+            }
 
             var titleFontRem = document.getElementById('txtsize').value + 'rem';
 
