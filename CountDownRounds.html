@@ -304,7 +304,7 @@ div#modal div:target {
       <a>End Time</a>
       <input type="time" id="etime" value="14:15" min="07:00" max="23:00"/>
       <a>Rounds</a>
-      <input type="number" min="1" id="rounds" value="3"/>
+      <input type="number" min="1" id="rounds" value="4"/>
       <a>Duration [R=1]</a>
       <input type="number" min="1" max="60" value="20" id="R1T"/>
       <a>Duration [1&lt;R&lt;N]</a>
@@ -334,7 +334,7 @@ div#modal div:target {
   <p id="warn">【LAST 5 MINUTES】</p>
   <p id="timeup">【TIME IS UP】</p>
   <button id="btnStart" onclick="onStart()">START</button>
-  <button id="btnContinue">Continue</button>
+  <button id="btnContinue" onclick="onContinue()">Continue</button>
   
 </div>
 
@@ -401,9 +401,18 @@ div#modal div:target {
 
         var roundCount = 0;
 
+        function setTodayDate(){
+          var today = new Date();
+          var txtToday = today.toDateString();
+          document.getElementById('ftoday').textContent = txtToday;
+        }
+
         function updateClockStart(s){
           if (s<0){
             clearTimeout(updateClockStart);
+            if (document.getElementById('toBeep').value=='ON'){
+              document.getElementById('beep').play();
+            }
             
             if (document.getElementById('rounds').value == 1){
               document.getElementById('btnStart').style.display = "inline-block";
@@ -431,7 +440,52 @@ div#modal div:target {
           var ss = s % 60;
           var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
           document.getElementById('clock').textContent = txtclock;
+          setTodayDate();
           setTimeout(updateClockStart, 1000, s-1);
+        }
+
+        function updateClockContinue(s){
+          // for the Continue button
+          if (s < 0){
+            // when times up
+            clearTimeout(updateClockStart);
+            if (document.getElementById('toBeep').value=='ON'){
+              document.getElementById('beep').play();
+            }
+            
+            if ((document.getElementById('rounds').value - roundCount) <= 1){
+              // Finish and reset
+              document.getElementById('btnStart').style.display = "inline-block";
+              document.getElementById('btnContinue').style.display = "none";
+              roundCount = 0;
+              var txtInitTime = document.getElementById('R1T').value.toString().padStart(2,0) + ':' + '00';
+              document.getElementById('clock').textContent = txtInitTime;
+            }
+            else{
+              // prepare next non-final round
+              document.getElementById('btnStart').style.display = "none";
+              document.getElementById('btnContinue').style.display = "inline-block";
+              roundCount += 1;
+              if ((document.getElementById('rounds').value - roundCount) > 1){
+                var txtInitTime = document.getElementById('RiT').value.toString().padStart(2,0) + ':' + '00';
+                document.getElementById('clock').textContent = txtInitTime;
+              }
+              else{
+                // next round is final
+                var txtInitTime = document.getElementById('RfT').value.toString().padStart(2,0) + ':' + '00';
+                document.getElementById('clock').textContent = txtInitTime;
+              }
+              
+            }
+            document.getElementById('RNum').textContent = 'Round ' + (roundCount+1).toString();
+            return;
+          }
+          var mm = Math.floor(s / 60);
+          var ss = s % 60;
+          var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
+          document.getElementById('clock').textContent = txtclock;
+          setTodayDate();
+          setTimeout(updateClockContinue, 1000, s-1);
         }
 
         function setUserData(){
@@ -500,6 +554,19 @@ div#modal div:target {
           var countSecond = document.getElementById('R1T').value * 60 -1;
           setTimeout(updateClockStart, 1000, countSecond);
           
+        }
+
+        function onContinue(){
+          document.getElementById('btnContinue').style.display = "none";
+          var countSecond = 0;
+          if ((document.getElementById('rounds').value - roundCount) == 1) {
+            countSecond = document.getElementById('RfT').value * 60 -1;
+          }
+          else{
+            countSecond = document.getElementById('RiT').value * 60 -1;
+          }
+          
+          setTimeout(updateClockContinue, 1000, countSecond);
         }
 
         
