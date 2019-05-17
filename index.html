@@ -1,0 +1,271 @@
+<!DOCTYPE DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Exam Timer
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+</head>
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.menu-container {
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  overflow: hidden;
+  left: 0;
+  top: 0;
+  transition-delay: .3s;
+}
+
+.menu {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  background-color: #1c7cd6;
+  border-radius: 100%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  transition: all .3s;
+}
+
+#hamburger {
+  display: none;
+}
+
+label#hamlabel {
+  position: absolute;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 100%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  z-index: 2;
+  cursor: pointer;
+  tap-highlight-color: transparent;
+}
+label:before {
+  content: "";
+  position: absolute;
+  top: 65%;
+  left: 65%;
+  width: 1em;
+  height: 0.15em;
+  background: white;
+  box-shadow: 0 0.25em 0 0 white, 0 0.5em 0 0 white;
+  -webkit-transform: scale(2);
+          transform: scale(2);
+}
+
+#hamburger:checked ~ .menu-container {
+  width: 30vw;
+  height: 100vh;
+  transition-delay: 0s;
+}
+
+#hamburger:checked ~ .menu-container .menu {
+  width: 250vh;
+  height: 250vh;
+  transition: all .3s;
+}
+
+.menu-container .links {
+  position: absolute;
+  left: 15vw;
+  top: 50vh;
+  z-index: 3;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  text-align: center;
+}
+.menu-container .links a {
+  display: block;
+  color: white;
+  font-size: 1.5rem;
+  text-decoration: none;
+  margin: 1rem;
+}
+
+.menu-container .links select {
+    font-size: 1.5rem;
+    margin: 0.5rem;
+    size: 32;
+}
+
+.menu-container .links input {
+    font-size: 1.2rem;
+    margin: 0.5rem;
+    size: 32;
+}
+
+
+.menu-container .links button {
+  display: block;
+  font-size: 2rem;
+  text-decoration: none;
+  margin: 1rem;
+  border-width: 3px;
+  border-color: white;
+}
+
+
+.content {
+  padding: 3rem 10rem;
+  transition: all .2s;
+  transition-delay: .1s;
+  text-align: center;
+}
+.content h1 {
+  font-size: 2rem;
+  color: #212529;
+}
+.content h1:not(.header) {
+  margin-top: 1rem;
+}
+.content p {
+  margin-top: 2rem;
+  color: #495057;
+}
+
+.content progress {
+    width: 80%;
+    height: 1vw;
+    display: inline-block;
+    background: #eeeeee;
+}
+
+.content progress::-webkit-progress-bar {
+   
+    background: #eeeeee;    
+}
+
+.content progress::-webkit-progress-value {
+    background: #1c7cd6;
+}
+
+.content #warn {
+    color: #ffbb00;
+    font-size: 3rem;
+    display: none;
+}
+
+.content #timeup {
+    color: #ff0000;
+    font-size: 3rem;
+    display: none;
+}
+
+.content .ui {
+  background-color: #1c7cd6;
+  color: #eeeeee;
+  padding: 3px;
+}
+
+#clock, #cdtimer, #about, #dl {
+  display: none;
+}
+
+#hamburger:checked ~ .content {
+  padding-left: 35vw;
+  transition: all .2s;
+  transition-delay: 0s;
+}
+
+
+
+</style>
+<body>
+ <!-- MENU -->   
+<input type="checkbox" id="hamburger" name="hamburger"/>
+<label id="hamlabel" for="hamburger"></label>
+<div class="menu-container">
+  <div class="menu"></div>
+  <div class="links">
+      <a href="./clock.html" onmouseover="onWC()">Wall Clock</a>
+      <a href="./CountDownRounds.html" onmouseover="onCD()">Multi-CountDown</a>
+      <a href="" onmouseover="onAbout()">About</a>
+      <a href="" onmouseover="onDL()">Download</a>
+      
+  </div>
+</div>
+<!-- Main content  -->
+<div class="content" id="content">
+  <div id="intro">
+    <h1>School Timer Sets</h1>
+    <p>To start, click on the hamburger-menu on top-left.</p>
+    <p>If you do not see a blue quarter sector with three strokes on top left, or layout looks obviously wrong, than this program is 
+      not suitable for your device. (P.S. Designed for Desktop and Laptop, no guarantee for lightweight mobile device).
+    </p>
+  </div> 
+  <div id="clock">
+    <h1>Big Wall Clock</h1>
+    <p>A big digital wall clock with progress bar. For most of the exam occasions.</p>
+    <p>Optional Features:
+      <ul>
+        <li>7-segment display</li>
+        <li>Text size and color customization</li>
+        <li>Beep on finish</li>
+      </ul>
+    </p>
+  </div>
+  <div id="cdtimer">
+    <h1>Multi-CountDown Timer</h1>
+    <p>Countdown timer for multiple rounds with set-once-and-forget in mind. Designed specially for IGCSE Physics practical exam.</p>
+    <p>If there is 1 round, <span class='ui'>Duration [R=1]</span> will be used</p>
+    <p>For 2 rounds, <span class="ui">Duration [R=1]</span> and <span class="ui">Duration [R=N]</span> will be used</p>
+    <p>For 3 rounds or more, the sequence will be <span class="ui">[R=1]</span>→<span class="ui">[1 &lt; R &lt; N]</span>… →<span class="ui">[R=N]</span> </p>
+    <p>Current round number and progress bar for current round will be displayed. With optional 7-segment display.</p>
+  </div>
+  <div id="about">
+    <h1>About</h1>
+    <p>Author: Mr. Tse YM (Maverick); Hong Kong, 2019</p>
+    <p>Released under <a href="https://github.com/MaverickTse/SchoolExamTimer/blob/master/LICENSE">MIT License</a></p>
+    <p>For bug report, please utilize <a href="https://github.com/MaverickTse/SchoolExamTimer/issues">GitHub issue page</a></p>
+  </div>
+  <div id="dl">
+    <h1>Download and Source Code</h1>
+    <p>This timer consist of simple HTML and Javascript, and can be run offline from any folder.</p>
+    <p><a href="https://github.com/MaverickTse/SchoolExamTimer/archive/master.zip">【DOWNLOAD】</a></p>
+    <p>To view the source code, please visit <a href="https://github.com/MaverickTse/SchoolExamTimer">GitHub repo</a></p>
+  </div>
+  
+</div>
+<script>
+  function hideIDs(){
+    var ids = ['intro', 'clock', 'cdtimer', 'about', 'dl'];
+    ids.forEach(
+      function(s){
+        document.getElementById(s).style.display = "none";
+        //console.info(s);
+      }
+    );
+  };
+
+  function onWC(){
+    hideIDs();
+    document.getElementById('clock').style.display = 'block';
+  }
+
+  function onCD(){
+    hideIDs();
+    document.getElementById('cdtimer').style.display = 'block';
+  }
+
+  function onAbout(){
+    hideIDs();
+    document.getElementById('about').style.display = 'block';
+  }
+
+  function onDL(){
+    hideIDs();
+    document.getElementById('dl').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
