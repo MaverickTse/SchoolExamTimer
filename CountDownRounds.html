@@ -441,6 +441,8 @@ div#modal div:target {
           var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
           document.getElementById('clock').textContent = txtclock;
           setTodayDate();
+          var barVal = ((document.getElementById('R1T').value*60 - s)/(document.getElementById('R1T').value*60))*100;
+          document.getElementById('barTop').value = barVal;
           setTimeout(updateClockStart, 1000, s-1);
         }
 
@@ -485,6 +487,15 @@ div#modal div:target {
           var txtclock = mm.toString().padStart(2,0) + ':' + ss.toString().padStart(2,0);
           document.getElementById('clock').textContent = txtclock;
           setTodayDate();
+          var pval = 0;
+          if ((document.getElementById('rounds').value - roundCount) <= 1){
+            // progress bar for last round
+            pval = (document.getElementById('RfT').value*60 - s)*100/ (document.getElementById('RfT').value*60);
+          }
+          else{
+            pval = (document.getElementById('RiT').value*60 - s)*100/ (document.getElementById('RiT').value*60);
+          }
+          document.getElementById('barTop').value = pval;
           setTimeout(updateClockContinue, 1000, s-1);
         }
 
